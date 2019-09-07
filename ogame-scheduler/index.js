@@ -1,5 +1,6 @@
 var AWS = require('aws-sdk');
 var eventbridge = new AWS.EventBridge();
+var lambda = new AWS.Lambda();
 
 exports.handler = async (event) => {
 
@@ -11,8 +12,6 @@ exports.handler = async (event) => {
         Name: ruleName, /* required */
         Description: 'Incoming alert of '+event.queryStringParameters.minutes+' minutes',
         EventBusName: busName,
-        //EventPattern: 'STRING_VALUE',
-        //RoleArn: 'STRING_VALUE',
         ScheduleExpression: 'rate('+event.queryStringParameters.minutes+' minutes)',
         State: 'ENABLED',
     };
@@ -21,22 +20,34 @@ exports.handler = async (event) => {
         EventBusName: busName,
         Targets: [ /* required */
             {
-                Id: 'ogame_target', /* required */
+                Id: 'ogame-target', /* required */
                 Arn: 'arn:aws:lambda:us-west-2:244562332426:function:ogame-scheduler-notification', /* required */
                 Input: JSON.stringify(event.queryStringParameters),
             },
-            /* more items */
         ],
     };
+    var params_lambda = {
+        StatementId: "ID-2",
+        Action: "lambda:InvokeFunction", 
+        FunctionName: "ogame-scheduler-notification", 
+        Principal: "events.amazonaws.com", 
+        SourceArn: "tbd", 
+     };
 
     
     try{
         //request rule
-        var ruleArn = await eventbridge.putRule(params).promise();
-        console.log(ruleArn);
+        var res = await eventbridge.putRule(params).promise();
+        var ruleArn = res.RuleArn;
+        console.log("putRule:" + res.RuleArn);
 
-        var res = await eventbridge.putTargets(params_target).promise();
-        console.log(res);
+        res = await eventbridge.putTargets(params_target).promise();
+        console.log("putTargets:" + JSON.stringify(res));
+
+        params_lambda.SourceArn = ruleArn;
+        //console.log("params_lambda:" + JSON.stringify(params_lambda));
+        res = await lambda.addPermission(params_lambda).promise();
+        console.log("addPermission:" + res);
     }
     catch(err){
         console.log(err);
