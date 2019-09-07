@@ -20,14 +20,14 @@ exports.handler = async (event) => {
         EventBusName: busName,
         Targets: [ /* required */
             {
-                Id: 'ogame-target', /* required */
+                Id: event.queryStringParameters.ruleName, /* required */
                 Arn: 'arn:aws:lambda:us-west-2:244562332426:function:ogame-scheduler-notification', /* required */
                 Input: JSON.stringify(event.queryStringParameters),
             },
         ],
     };
     var params_lambda = {
-        StatementId: "ID-2",
+        StatementId: event.queryStringParameters.ruleName,
         Action: "lambda:InvokeFunction", 
         FunctionName: "ogame-scheduler-notification", 
         Principal: "events.amazonaws.com", 
@@ -45,9 +45,8 @@ exports.handler = async (event) => {
         console.log("putTargets:" + JSON.stringify(res));
 
         params_lambda.SourceArn = ruleArn;
-        //console.log("params_lambda:" + JSON.stringify(params_lambda));
         res = await lambda.addPermission(params_lambda).promise();
-        console.log("addPermission:" + res);
+        console.log("addPermission:" + JSON.stringify(res));
     }
     catch(err){
         console.log(err);
