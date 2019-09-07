@@ -3,7 +3,7 @@ var eventbridge = new AWS.EventBridge();
 
 exports.handler = async (event) => {
 
-    var ruleName = 'ogame_scheduler';
+    var ruleName = event.queryStringParameters.ruleName;
     var busName = 'default';
 
     /* Create rule request */
@@ -18,11 +18,12 @@ exports.handler = async (event) => {
     };
     var params_target = {
         Rule: ruleName, /* required */
-        EventBusName: busName
+        EventBusName: busName,
         Targets: [ /* required */
             {
                 Id: 'ogame_target', /* required */
                 Arn: 'arn:aws:lambda:us-west-2:244562332426:function:ogame-scheduler-notification', /* required */
+                Input: JSON.stringify(event.queryStringParameters),
             },
             /* more items */
         ],
