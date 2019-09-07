@@ -1,0 +1,13 @@
+{
+	"folders":
+	[
+		{
+			"path": "C:\\Users\\victo\\Documents\\repos\\chrome-ogame-ui-extension"
+		}
+	],
+	"build_systems":
+	  [{
+	    "name": "Deploy",
+	    "cmd": ["make", "deploy"]
+	  }]
+}
