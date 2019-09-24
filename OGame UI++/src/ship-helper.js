@@ -38,7 +38,7 @@ var fn = function () {
           pt: { metal: false, crystal: false, deuterium: false },
           gt: { metal: false, crystal: false, deuterium: false }
         };
-        var cargo = { pt: 5000, gt: 25000 };
+        var cargo = { pt: 5000, gt: 35000 };
         var elements = { pt: $el.find('#ship_202'), gt: $el.find('#ship_203') };
         var resources = window._getCurrentPlanetResources();
 
